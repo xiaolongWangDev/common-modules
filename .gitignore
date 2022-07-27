@@ -1,6 +1,5 @@
-/jmeter-cluster/src/jlogs/
+/jmeter-cluster/src/jmeter_home/jlogs
 /.idea/
 /rubber-duck-server/target
 /**/*.iml
 /**/*.jtl
-/**/*.jmx

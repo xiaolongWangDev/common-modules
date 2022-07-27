@@ -1,30 +1,25 @@
 package wang.xiaolong.proj.rubberduckserver;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.net.InetAddress;
-import java.net.UnknownHostException;
+import java.util.Map;
 
 
 @RestController
 public class RubberDuckController {
+    @Value("${rubber.duck.ip: unspecified}")
     private String serverAddress;
 
-    public RubberDuckController() {
-        try {
-            InetAddress address = InetAddress.getLocalHost();
-            this.serverAddress = address.getHostAddress();
-        } catch (UnknownHostException e) {
-            e.printStackTrace();
-        }
-    }
-
     @GetMapping("/echo/{msg}")
-    public String echo(@PathVariable String msg, HttpServletResponse response) {
+    public Map<String, Object> echo(@PathVariable String msg, HttpServletRequest request, HttpServletResponse response) {
         response.addHeader("server_host", serverAddress);
-        return serverAddress + " echos:" + msg;
+        response.addHeader("client_host", request.getRemoteAddr());
+        response.addHeader("msg", msg);
+        return Map.of("server", serverAddress, "client", request.getRemoteAddr(), "msg", msg);
     }
 }

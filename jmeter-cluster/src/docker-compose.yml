@@ -3,28 +3,33 @@ services:
   slave-1:
     image: justb4/jmeter
     volumes:
-      - .:/mnt/jmeter
+      - ./jmeter_home:/mnt/jmeter
     command: -s -n -Jclient.rmi.localport=7000 -Jserver.rmi.localport=60000 -Jserver.rmi.ssl.disable=true -j /mnt/jmeter/jlogs/slave1.log
   slave-2:
     image: justb4/jmeter
     volumes:
-      - .:/mnt/jmeter
+      - ./jmeter_home:/mnt/jmeter
     command: -s -n -Jclient.rmi.localport=7000 -Jserver.rmi.localport=60000 -Jserver.rmi.ssl.disable=true -j /mnt/jmeter/jlogs/slave2.log
   slave-3:
     image: justb4/jmeter
     volumes:
-      - .:/mnt/jmeter
+      - ./jmeter_home:/mnt/jmeter
     command: -s -n -Jclient.rmi.localport=7000 -Jserver.rmi.localport=60000 -Jserver.rmi.ssl.disable=true -j /mnt/jmeter/jlogs/slave3.log
   master:
     image: justb4/jmeter
     volumes:
-      - .:/mnt/jmeter
+      - ./jmeter_home:/mnt/jmeter
     depends_on:
       - slave-1
       - slave-2
       - slave-3
+      - rubber-duck-1
     environment:
       - DISPLAY=host.docker.internal:0
-    command: -t /mnt/jmeter/poke_ducks.jmx -Jclient.rmi.localport=7000 -Jserver.rmi.ssl.disable=true -Jremote_hosts=slave-1,slave-2,slave-3 -l /mnt/jmeter/result.jtl -j /mnt/jmeter/jlogs/master.log
+    command: -t /mnt/jmeter/test_rubber_duck.jmx -Jclient.rmi.localport=7000 -Jserver.rmi.ssl.disable=true -Jremote_hosts=slave-1,slave-2,slave-3 -l /mnt/jmeter/result.jtl -j /mnt/jmeter/jlogs/master.log
+  rubber-duck-1:
+    image: rubber-duck-server:0.0.1-SNAPSHOT
+    environment:
+      - RUBBER_DUCK_IP=duck-1
 networks:
   jmeter_cluster: {}
